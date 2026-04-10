@@ -513,12 +513,12 @@ async def realtime_assist(session_id: str, payload: RealtimePayload):
         f"=== {d['name']} ===\n{d['text'][:_ctx_chars]}" for d in documents
     )
 
-    prompt = prompt = f"""You are a real-time interview assistant helping a candidate in a live interview.
+    prompt = f"""You are an interview coach helping a candidate in a live interview.
 
 The candidate just heard or started saying:
 "{text}"
 
-CANDIDATE CONTEXT (CV, job description, skills):
+CANDIDATE CONTEXT (CV, job description, skills, etc.):
 {doc_context}
 
 TASK:
@@ -528,22 +528,19 @@ TASK:
    - "skip": completely unrelated to interviews (e.g. small talk, background noise)
    When in doubt, classify as "question" or "completion" — it's better to help than stay silent.
 
-2. Write a natural, spoken answer the candidate can use as inspiration — NOT a script to read word-for-word.
+2. Write a strong answer the candidate can use as a starting point — same quality and style as a well-prepared interview coach would give.
 
-ANSWER STYLE RULES:
-- Write as if the candidate is speaking out loud, not writing an essay.
-- Use natural spoken language: contractions, short sentences, the occasional pause filler rephrased as a transition ("So...", "What I found was...", "Honestly...").
-- Vary sentence length — mix short punchy sentences with slightly longer ones.
-- Avoid starting multiple sentences the same way.
-- NO bullet-point thinking hidden inside prose (don't write "Firstly... Secondly... Finally...").
-- For behavioural questions ("tell me about a time..."): weave a real story from the CV naturally — don't announce STAR sections.
-- For knowledge/opinion questions: answer directly and conversationally, like you're explaining to a colleague.
-- Only reference the CV when the question is specifically about experience.
-- For behavioural/story questions: 8–12 sentences — enough to tell a full, rich story with real detail.
-- For knowledge/opinion questions: 4–6 sentences — clear and direct, no padding.
+RULES:
+- Use natural spoken language: contractions, varied sentence structure, conversational flow.
+- For behavioural/situational questions ("Tell me about a time...", "Describe a situation...", "Give me an example..."): tell a real story using the candidate's CV. Don't label STAR sections — just tell it as a natural story (situation → what you did → what happened). Use multiple examples from the CV where relevant. 8–10 sentences.
+- For technical or knowledge questions ("how does X work", "explain Y", "what are the steps"): answer directly and confidently like explaining to a peer. No storytelling, no CV references needed. 4–6 sentences.
+- For opinion/motivation questions ("why do you want", "how do you approach", "what's your style"): give a genuine, well-reasoned answer. 4–6 sentences.
+- Draw on specific details from the CV (companies, roles, projects, technologies, outcomes) only when the question is about experience.
+- No bullet-point prose ("Firstly... Secondly..."). No filler phrases ("That's a great question", "In conclusion").
+- Write in first person.
 
 Return ONLY valid JSON:
-{{"type": "question"|"completion"|"skip", "answer": "<spoken-style answer or null if skip>"}}"""
+{{"type": "question"|"completion"|"skip", "answer": "<answer or null if skip>"}}"""
 
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
