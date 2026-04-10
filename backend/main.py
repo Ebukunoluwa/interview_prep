@@ -509,7 +509,7 @@ async def realtime_assist(session_id: str, payload: RealtimePayload):
     session = load_session(session_id)
     documents = session.get("documents") or [{"name": "context", "text": session["jd_text"]}]
     doc_context = "\n\n".join(
-        f"=== {d['name']} ===\n{d['text'][:8000]}" for d in documents
+        f"=== {d['name']} ===\n{d['text'][:3000]}" for d in documents
     )
 
     prompt = f"""You are a real-time interview assistant. The candidate just heard or started saying:
@@ -545,7 +545,7 @@ Return ONLY valid JSON:
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
-        max_tokens=1024,
+        max_tokens=512,
     )
 
     raw = response.choices[0].message.content.strip()
