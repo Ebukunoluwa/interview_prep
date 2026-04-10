@@ -513,38 +513,43 @@ async def realtime_assist(session_id: str, payload: RealtimePayload):
         f"=== {d['name']} ===\n{d['text'][:_ctx_chars]}" for d in documents
     )
 
-    prompt = f"""You are a real-time interview assistant. The candidate just heard or started saying:
+    prompt = prompt = f"""You are a real-time interview assistant helping a candidate in a live interview.
 
+The candidate just heard or started saying:
 "{text}"
 
 CANDIDATE CONTEXT (CV, job description, skills):
 {doc_context}
 
 TASK:
-1. Classify what was said into one of:
-   - "question": an interview question being asked to the candidate
-   - "completion": the candidate started speaking an answer but didn't finish
-   - "skip": completely unrelated to interviews (e.g. "pass me the water", "okay thanks bye")
+1. Classify what was said as one of:
+   - "question": an interview question asked to the candidate
+   - "completion": the candidate started an answer but trailed off
+   - "skip": completely unrelated to interviews (e.g. small talk, background noise)
+   When in doubt, classify as "question" or "completion" — it's better to help than stay silent.
 
-   When in doubt, classify as "question" or "completion" rather than "skip". It is better to give a useful answer than to stay silent.
+2. Write a natural, spoken answer the candidate can use as inspiration — NOT a script to read word-for-word.
 
-2. Write a complete, strong answer the candidate can use:
-   - Read the question carefully and choose the right answer style:
-     • If the question explicitly says "tell me about a time", "give me an example", "describe a situation", "walk me through a time": use STAR with real examples from the CV.
-     • For everything else — "how does X work", "what are the steps", "explain Y", "why do you want", "how do you approach", "what is": just answer it directly and clearly. No examples, no CV references, no STAR. Just a clean, knowledgeable answer.
-   - Do NOT force examples or personal stories into questions that are asking for knowledge, process, or opinion.
-   - Only reference the CV when the question is specifically about the candidate's experience.
-   - If "completion": continue in whatever style matches what they were already saying.
-   - 4–8 sentences, direct, confident, no filler.
+ANSWER STYLE RULES:
+- Write as if the candidate is speaking out loud, not writing an essay.
+- Use natural spoken language: contractions, short sentences, the occasional pause filler rephrased as a transition ("So...", "What I found was...", "Honestly...").
+- Vary sentence length — mix short punchy sentences with slightly longer ones.
+- Avoid starting multiple sentences the same way.
+- NO bullet-point thinking hidden inside prose (don't write "Firstly... Secondly... Finally...").
+- For behavioural questions ("tell me about a time..."): weave a real story from the CV naturally — don't announce STAR sections.
+- For knowledge/opinion questions: answer directly and conversationally, like you're explaining to a colleague.
+- Only reference the CV when the question is specifically about experience.
+- For behavioural/story questions: 8–12 sentences — enough to tell a full, rich story with real detail.
+- For knowledge/opinion questions: 4–6 sentences — clear and direct, no padding.
 
 Return ONLY valid JSON:
-{{"type": "question"|"completion"|"skip", "answer": "<full answer or null if skip>"}}"""
+{{"type": "question"|"completion"|"skip", "answer": "<spoken-style answer or null if skip>"}}"""
 
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
-        max_tokens=int(os.getenv("REALTIME_MAX_TOKENS", "1400")),
+        max_tokens=int(os.getenv("REALTIME_MAX_TOKENS", "2000")),
     )
 
     raw = response.choices[0].message.content.strip()
@@ -571,22 +576,24 @@ async def suggest_answer(session_id: str, payload: SuggestPayload):
         f"=== {d['name']} ===\n{d['text'][:4000]}" for d in documents
     )
 
-    prompt = f"""You are an expert interview coach helping a candidate prepare. Using the candidate's background and the job context below, write a strong, personalised answer to the interview question.
+    prompt = f"""You are an interview coach helping a candidate prepare for a real interview.
 
 CANDIDATE CONTEXT (CV, job description, skills, etc.):
 {doc_context}
 
 QUESTION: {payload.question}
 
-INSTRUCTIONS:
-- If this is a behavioural or situational question ("Tell me about a time...", "Describe a situation...", "How would you handle..."), use the STAR format: Situation → Task → Action → Result. Make the result concrete with numbers or outcomes where possible.
-- If this is a technical question, give a direct, expert-level answer instead — no STAR needed.
-- Draw on specific details from the candidate's CV (companies, projects, technologies, achievements) wherever relevant to make the answer feel personal and credible.
-- If the CV doesn't have enough specifics, use plausible but realistic examples that fit the role.
-- 4–8 sentences. Confident, clear, no waffle.
+Write a strong answer the candidate can use as a starting point — it should sound like something a real person would say out loud, not a written essay.
+
+RULES:
+- Use natural spoken language: contractions, varied sentence structure, conversational flow.
+- For behavioural/situational questions ("Tell me about a time...", "Describe a situation..."): tell a real story using the candidate's CV. Don't label STAR sections — just tell it as a natural story (situation → what you did → what happened).
+- For technical or opinion questions: answer directly and confidently, like explaining to a peer. No storytelling needed.
+- Draw on specific details from the CV (companies, projects, technologies, outcomes) to make it feel personal.
+- 4–6 sentences. No bullet-point prose ("Firstly... Secondly..."). No filler phrases ("That's a great question", "In conclusion").
+- Write in first person.
 
 Return ONLY the answer text. No labels, no preamble."""
-
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
