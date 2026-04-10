@@ -532,12 +532,12 @@ TASK:
    - For ANY behavioural, situational, or competency question (tell me about a time, describe a situation, how do you handle, give an example of, what would you do, etc.): structure the answer using the STAR method:
      **Situation** – briefly set the scene
      **Task** – what your responsibility was
-     **Action** – the specific steps YOU personally took
+     **Action** – the specific steps YOU personally took (pull from MULTIPLE real examples and projects from the CV — do not rely on just one)
      **Result** – concrete, measurable outcome (numbers/impact preferred)
-   - For technical questions: give a direct expert-level answer with a concrete example
+   - Actively scan the entire CV for relevant experiences, projects, roles, and achievements. Reference specific role names, company names, tools, and outcomes mentioned in the CV. Use more than one example where the question allows it (e.g. "In my role at X I did A, and similarly at Y I did B").
+   - For technical questions: give a direct expert-level answer grounded in the candidate's actual tech stack and projects from the CV
    - If "completion": continue seamlessly from where they stopped and close with a STAR result where applicable
-   - Draw on the candidate's CV, experience, and skills from the context above wherever possible
-   - 5–8 sentences, confident, specific, no filler
+   - 6–10 sentences, confident, specific, rich with real detail from the CV — no generic filler
 
 Return ONLY valid JSON:
 {{"type": "question"|"completion"|"skip", "answer": "<full answer or null if skip>"}}"""
@@ -546,7 +546,7 @@ Return ONLY valid JSON:
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
-        max_tokens=int(os.getenv("REALTIME_MAX_TOKENS", "1024")),
+        max_tokens=int(os.getenv("REALTIME_MAX_TOKENS", "1400")),
     )
 
     raw = response.choices[0].message.content.strip()
