@@ -529,15 +529,13 @@ TASK:
    When in doubt, classify as "question" or "completion" rather than "skip". It is better to give a useful answer than to stay silent.
 
 2. Write a complete, strong answer the candidate can use:
-   - First judge what type of answer the question needs:
-     • Behavioural/situational ("tell me about a time", "give an example", "describe a situation", "how have you handled"): use STAR method with MULTIPLE real examples from the CV — Situation, Task, Action (specific steps YOU took), Result (measurable outcome). Reference actual roles, companies, tools from the CV. Use more than one experience where relevant.
-     • Opinion/approach questions ("how do you prioritise", "what's your management style", "why do you want this role"): give a direct, confident, well-reasoned answer — no STAR needed, just clear thinking.
-     • Technical questions ("what is X", "how does Y work", "explain Z"): give a direct expert answer grounded in the candidate's actual tech stack and projects.
-     • Motivational/fit questions ("why us", "where do you see yourself"): give a genuine, specific answer tied to the role and company from the JD.
-   - Only use STAR when the question explicitly asks for an example or experience — do not force it on every question.
-   - Always draw on the candidate's real CV details (roles, companies, tools, achievements) wherever relevant.
-   - If "completion": continue seamlessly from where they stopped in the same style.
-   - 5–9 sentences, confident, specific, no generic filler.
+   - Read the question carefully and choose the right answer style:
+     • If the question explicitly says "tell me about a time", "give me an example", "describe a situation", "walk me through a time": use STAR with real examples from the CV.
+     • For everything else — "how does X work", "what are the steps", "explain Y", "why do you want", "how do you approach", "what is": just answer it directly and clearly. No examples, no CV references, no STAR. Just a clean, knowledgeable answer.
+   - Do NOT force examples or personal stories into questions that are asking for knowledge, process, or opinion.
+   - Only reference the CV when the question is specifically about the candidate's experience.
+   - If "completion": continue in whatever style matches what they were already saying.
+   - 4–8 sentences, direct, confident, no filler.
 
 Return ONLY valid JSON:
 {{"type": "question"|"completion"|"skip", "answer": "<full answer or null if skip>"}}"""
