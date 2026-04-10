@@ -29,35 +29,34 @@ export default function AssistantListener({ sessionId }) {
   useEffect(() => { answerRef.current = answer }, [answer])
   useEffect(() => { loadingRef.current = loading }, [loading])
 
-  // Keypress while active:
+  // Shared handler: tap or keypress
   //   • answer showing  → clear and go back to listening
   //   • listening/transcript → immediately submit what's been heard so far
+  function handleInteract(e) {
+    // Ignore modifier-only keys
+    if (e?.key && ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return
+
+    if (answerRef.current) {
+      clearTimeout(debounceRef.current)
+      accumulatedRef.current = ''
+      transcriptRef.current = ''
+      setAnswer('')
+      setTranscript('')
+      setAnswerType('')
+    } else if (!loadingRef.current) {
+      const captured = (accumulatedRef.current + ' ' + transcriptRef.current).trim()
+      clearTimeout(debounceRef.current)
+      accumulatedRef.current = ''
+      transcriptRef.current = ''
+      setTranscript('')
+      if (captured.length >= MIN_CHARS) triggerAssist(captured)
+    }
+  }
+
   useEffect(() => {
     if (!active) return
-    function handleKey(e) {
-      // Ignore modifier-only keys and Escape (Escape used for nothing here but keep it clean)
-      if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return
-
-      if (answerRef.current) {
-        // Answer shown → clear and start fresh
-        clearTimeout(debounceRef.current)
-        accumulatedRef.current = ''
-        transcriptRef.current = ''
-        setAnswer('')
-        setTranscript('')
-        setAnswerType('')
-      } else if (!loadingRef.current) {
-        // Still listening → grab everything heard so far and fire immediately
-        const captured = (accumulatedRef.current + ' ' + transcriptRef.current).trim()
-        clearTimeout(debounceRef.current)
-        accumulatedRef.current = ''
-        transcriptRef.current = ''
-        setTranscript('')
-        if (captured.length >= MIN_CHARS) triggerAssist(captured)
-      }
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
+    window.addEventListener('keydown', handleInteract)
+    return () => window.removeEventListener('keydown', handleInteract)
   }, [active])
 
   // ── Speech recognition ───────────────────────────────────────────────────
@@ -195,7 +194,7 @@ export default function AssistantListener({ sessionId }) {
 
       {/* Full-screen active overlay */}
       {active && (
-        <div className="fixed inset-0 z-50 bg-gray-950/97 backdrop-blur-md flex flex-col">
+        <div className="fixed inset-0 z-50 bg-gray-950/97 backdrop-blur-md flex flex-col" onClick={handleInteract}>
 
           {/* Top bar */}
           <div className="flex items-center justify-between px-8 py-4 border-b border-gray-800">
@@ -206,7 +205,7 @@ export default function AssistantListener({ sessionId }) {
               </span>
             </div>
             <button
-              onClick={deactivate}
+              onClick={(e) => { e.stopPropagation(); deactivate() }}
               className="text-gray-500 hover:text-white text-2xl leading-none transition-colors"
             >✕</button>
           </div>
@@ -266,11 +265,11 @@ export default function AssistantListener({ sessionId }) {
                   </span>
                   <div className="flex items-center gap-4">
                     <button
-                      onClick={() => navigator.clipboard.writeText(answer)}
+                      onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(answer) }}
                       className="text-sm text-brand-400 hover:text-brand-300 font-medium"
                     >Copy</button>
                     <button
-                      onClick={() => { setAnswer(''); setTranscript(''); setAnswerType('') }}
+                      onClick={(e) => { e.stopPropagation(); setAnswer(''); setTranscript(''); setAnswerType('') }}
                       className="text-sm text-gray-500 hover:text-white"
                     >Clear</button>
                   </div>
