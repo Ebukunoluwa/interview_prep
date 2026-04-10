@@ -529,15 +529,15 @@ TASK:
    When in doubt, classify as "question" or "completion" rather than "skip". It is better to give a useful answer than to stay silent.
 
 2. Write a complete, strong answer the candidate can use:
-   - For ANY behavioural, situational, or competency question (tell me about a time, describe a situation, how do you handle, give an example of, what would you do, etc.): structure the answer using the STAR method:
-     **Situation** – briefly set the scene
-     **Task** – what your responsibility was
-     **Action** – the specific steps YOU personally took (pull from MULTIPLE real examples and projects from the CV — do not rely on just one)
-     **Result** – concrete, measurable outcome (numbers/impact preferred)
-   - Actively scan the entire CV for relevant experiences, projects, roles, and achievements. Reference specific role names, company names, tools, and outcomes mentioned in the CV. Use more than one example where the question allows it (e.g. "In my role at X I did A, and similarly at Y I did B").
-   - For technical questions: give a direct expert-level answer grounded in the candidate's actual tech stack and projects from the CV
-   - If "completion": continue seamlessly from where they stopped and close with a STAR result where applicable
-   - 6–10 sentences, confident, specific, rich with real detail from the CV — no generic filler
+   - First judge what type of answer the question needs:
+     • Behavioural/situational ("tell me about a time", "give an example", "describe a situation", "how have you handled"): use STAR method with MULTIPLE real examples from the CV — Situation, Task, Action (specific steps YOU took), Result (measurable outcome). Reference actual roles, companies, tools from the CV. Use more than one experience where relevant.
+     • Opinion/approach questions ("how do you prioritise", "what's your management style", "why do you want this role"): give a direct, confident, well-reasoned answer — no STAR needed, just clear thinking.
+     • Technical questions ("what is X", "how does Y work", "explain Z"): give a direct expert answer grounded in the candidate's actual tech stack and projects.
+     • Motivational/fit questions ("why us", "where do you see yourself"): give a genuine, specific answer tied to the role and company from the JD.
+   - Only use STAR when the question explicitly asks for an example or experience — do not force it on every question.
+   - Always draw on the candidate's real CV details (roles, companies, tools, achievements) wherever relevant.
+   - If "completion": continue seamlessly from where they stopped in the same style.
+   - 5–9 sentences, confident, specific, no generic filler.
 
 Return ONLY valid JSON:
 {{"type": "question"|"completion"|"skip", "answer": "<full answer or null if skip>"}}"""
