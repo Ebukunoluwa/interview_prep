@@ -36,19 +36,10 @@ async def global_exception_handler(request: Request, exc: Exception):
     print("UNHANDLED EXCEPTION:", detail)
     return JSONResponse(status_code=500, content={"detail": detail})
 
-_allowed_origins = [
-    "http://localhost:5173",      # Vite dev server
-    "http://localhost:3000",      # alternate local
-    "capacitor://localhost",      # iOS Capacitor
-    "http://localhost",           # Android Capacitor
-]
-if os.getenv("FRONTEND_URL"):
-    _allowed_origins.append(os.getenv("FRONTEND_URL"))
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_allowed_origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
