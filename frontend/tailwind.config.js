@@ -20,5 +20,15 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addBase }) {
+      addBase({
+        'button, a, [role="button"]': {
+          'touch-action': 'manipulation',
+          '-webkit-tap-highlight-color': 'transparent',
+          'cursor': 'pointer',
+        },
+      })
+    }
+  ],
 }
