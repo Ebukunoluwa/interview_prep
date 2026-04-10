@@ -281,7 +281,7 @@ export default function AssistantListener({ sessionId }) {
 
           {/* Bottom hint */}
           <div className="text-center py-6 text-gray-600 text-sm">
-            {answer ? 'Press any key to start a new transcript' : 'Press any key to generate answer · ✕ to close'}
+            {answer ? 'Tap anywhere to start a new transcript' : 'Tap anywhere to generate answer · ✕ to close'}
           </div>
         </div>
       )}
