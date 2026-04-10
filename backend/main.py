@@ -570,7 +570,7 @@ async def suggest_answer(session_id: str, payload: SuggestPayload):
     documents = session.get("documents") or [{"name": "context", "text": session["jd_text"]}]
 
     doc_context = "\n\n".join(
-        f"=== {d['name']} ===\n{d['text'][:4000]}" for d in documents
+        f"=== {d['name']} ===\n{d['text'][:8000]}" for d in documents
     )
 
     prompt = f"""You are an interview coach helping a candidate prepare for a real interview.
