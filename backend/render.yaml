@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: interview-coach-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements-deploy.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DEEPGRAM_API_KEY
+        sync: false
+      - key: LIVEKIT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: SESSIONS_DIR
+        value: /data/sessions
+      - key: UPLOADS_DIR
+        value: /data/uploads
