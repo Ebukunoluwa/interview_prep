@@ -3,10 +3,16 @@
 @tailwind utilities;
 
 @layer base {
+  html, body, #root {
+    height: 100%;
+  }
   body {
     @apply bg-gray-950 text-gray-100 antialiased;
-    touch-action: manipulation; /* removes 300ms tap delay on mobile */
+    touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 }
 

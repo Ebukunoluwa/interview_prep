@@ -32,7 +32,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col" style={{ height: '100dvh' }}>
       {/* Header */}
       <header className="border-b border-gray-800 px-6 py-4 flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
@@ -64,7 +64,7 @@ export default function App() {
       <AssistantListener sessionId={assistantSessionId} />
 
       {/* Main */}
-      <main className="flex-1 flex items-start justify-center px-4 py-10">
+      <main className="flex-1 overflow-y-auto flex items-start justify-center px-4 py-6">
         {view === VIEWS.UPLOAD && (
           <Upload onComplete={handleUploadComplete} onSessionReady={handleSessionReady} />
         )}
