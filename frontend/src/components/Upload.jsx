@@ -131,7 +131,10 @@ export default function Upload({ onComplete, onSessionReady }) {
   }
 
   async function gradeAnswer(index, text) {
-    if (!sessionId) return
+    if (!sessionId) {
+      setError('No active session — please generate questions first.')
+      return
+    }
     setGrading(prev => ({ ...prev, [index]: true }))
     try {
       const res = await fetch(`${API}/grade-answer/${sessionId}`, {
@@ -143,10 +146,17 @@ export default function Upload({ onComplete, onSessionReady }) {
         const grade = await res.json()
         setGrades(prev => {
           const next = { ...prev, [index]: grade }
-          saveToStorage(questions, sessionId, answers, next)
+          setAnswers(ans => { saveToStorage(questions, sessionId, ans, next); return ans })
           return next
         })
+      } else {
+        const detail = await res.text()
+        console.error('Grade failed:', res.status, detail)
+        setError(`Grading failed (${res.status}) — check your connection and try again.`)
       }
+    } catch (err) {
+      console.error('Grade error:', err)
+      setError('Could not reach the server to grade your answer.')
     } finally {
       setGrading(prev => ({ ...prev, [index]: false }))
     }
