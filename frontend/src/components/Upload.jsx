@@ -560,6 +560,34 @@ export default function Upload({ onComplete, onSessionReady }) {
             </span>
           ) : 'Generate questions & start'}
         </button>
+
+        {/* Regenerate from existing session — no re-upload needed */}
+        {sessionId && questions.length > 0 && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={async () => {
+              setError('')
+              setStatus('generating')
+              try {
+                const res = await fetch(`${API}/generate-questions/${sessionId}`, { method: 'POST' })
+                if (!res.ok) throw new Error(`Failed (${res.status})`)
+                const { questions: qs } = await res.json()
+                setQuestions(qs)
+                setAnswers({})
+                setGrades({})
+                saveToStorage(qs, sessionId, {}, {})
+              } catch (err) {
+                setError(err.message)
+              } finally {
+                setStatus('idle')
+              }
+            }}
+            className="w-full text-sm text-brand-400 hover:text-brand-300 py-2 border border-brand-700 hover:border-brand-500 rounded-xl transition-colors"
+          >
+            {status === 'generating' && !jdFiles.length ? <span className="flex items-center justify-center gap-2"><Spinner />Generating…</span> : '↻ Generate new questions from existing context'}
+          </button>
+        )}
       </form>
 
       {/* ── Practice questions ── */}
