@@ -513,6 +513,15 @@ async def realtime_assist(session_id: str, payload: RealtimePayload):
         f"=== {d['name']} ===\n{d['text'][:_ctx_chars]}" for d in documents
     )
 
+    # Build reference answer bank from uploaded question bank Q&A pairs
+    qa_pairs = [p for p in session.get("qa_pairs", []) if p.get("answer", "").strip()]
+    qa_bank = ""
+    if qa_pairs:
+        qa_bank = "\n\nPREPARED ANSWER BANK (from the candidate's uploaded question bank):\n"
+        qa_bank += "\n".join(
+            f"Q: {p['question']}\nA: {p['answer']}" for p in qa_pairs[:30]
+        )
+
     prompt = f"""You are an interview coach helping a candidate in a live interview.
 
 The candidate just heard or started saying:
@@ -520,6 +529,7 @@ The candidate just heard or started saying:
 
 CANDIDATE CONTEXT (CV, job description, skills, etc.):
 {doc_context}
+{qa_bank}
 
 TASK:
 1. Classify what was said as one of:
@@ -528,15 +538,17 @@ TASK:
    - "skip": completely unrelated to interviews (e.g. small talk, background noise)
    When in doubt, classify as "question" or "completion" — it's better to help than stay silent.
 
-2. Write a strong answer the candidate can use as a starting point — same quality and style as a well-prepared interview coach would give.
+2. Write a strong answer using this priority order:
+   STEP 1 — Check the PREPARED ANSWER BANK above. If there is a question that is the same or semantically similar to what was asked, use that prepared answer as your primary source. Adapt it to sound natural and spoken — do not copy it word for word, but keep the substance and key points.
+   STEP 2 — If no similar prepared answer exists, generate a fresh answer using the candidate's CV, job description, and context.
+   STEP 3 — If the candidate started answering ("completion"), continue naturally from where they left off, using the prepared answer bank or CV context to complete and strengthen it.
 
-RULES:
+ANSWER STYLE RULES:
 - Use natural spoken language: contractions, varied sentence structure, conversational flow.
-- For behavioural/situational questions ("Tell me about a time...", "Describe a situation...", "Give me an example..."): tell a real story using the candidate's CV. Don't label STAR sections — just tell it as a natural story (situation → what you did → what happened). Use multiple examples from the CV where relevant. 8–10 sentences.
-- For technical or knowledge questions ("how does X work", "explain Y", "what are the steps"): answer directly and confidently like explaining to a peer. No storytelling, no CV references needed. 4–6 sentences.
-- For opinion/motivation questions ("why do you want", "how do you approach", "what's your style"): give a genuine, well-reasoned answer. 4–6 sentences.
-- Draw on specific details from the CV (companies, roles, projects, technologies, outcomes) only when the question is about experience.
-- No bullet-point prose ("Firstly... Secondly..."). No filler phrases ("That's a great question", "In conclusion").
+- For behavioural/situational questions ("Tell me about a time...", "Describe a situation...", "Give me an example..."): tell a real story using the candidate's CV. Don't label STAR sections — just tell it as a natural story. Use multiple examples from the CV where relevant. 8–10 sentences.
+- For technical or knowledge questions: answer directly and confidently like explaining to a peer. No storytelling needed. 4–6 sentences.
+- For opinion/motivation questions: give a genuine, well-reasoned answer. 4–6 sentences.
+- No bullet-point prose. No filler phrases ("That's a great question", "In conclusion").
 - Write in first person.
 
 Return ONLY valid JSON:
