@@ -16,7 +16,7 @@ from groq import Groq
 from livekit.api import AccessToken, VideoGrants
 from pydantic import BaseModel
 
-from utils.parser import parse_file, parse_qa_pairs, parse_text
+from utils.parser import parse_file, parse_qa_pairs
 
 load_dotenv()
 
@@ -355,7 +355,7 @@ async def upload_documents(
     qa_pairs: list[dict] = []
     if qa_file:
         qa_content = await qa_file.read()
-        qa_text = parse_text(qa_content)
+        qa_text = parse_file(qa_content, qa_file.filename, groq_client)
         qa_pairs = parse_qa_pairs(qa_text)
 
     session_id = uuid.uuid4().hex[:10]
