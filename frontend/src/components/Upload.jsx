@@ -538,7 +538,7 @@ export default function Upload({ onComplete, onSessionReady }) {
 
         <div className="card cursor-pointer border-2 border-dashed border-gray-700 hover:border-gray-600 transition-colors"
           onClick={() => qaRef.current.click()}>
-          <input ref={qaRef} type="file" accept=".txt,.md" className="hidden"
+          <input ref={qaRef} type="file" accept=".txt,.md,.pdf,.docx,.jpg,.jpeg,.png,.webp" className="hidden"
             onChange={(e) => setQaFile(e.target.files[0])} />
           <div className="text-center space-y-1">
             <p className="font-medium text-gray-300">Custom Q&amp;A pairs <span className="text-gray-500 text-sm">(optional)</span></p>
