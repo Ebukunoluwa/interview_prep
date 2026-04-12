@@ -544,11 +544,19 @@ TASK:
    STEP 3 — If the candidate started answering ("completion"), continue naturally from where they left off, using the prepared answer bank or CV context to complete and strengthen it.
 
 ANSWER STYLE RULES:
-- Use natural spoken language: contractions, varied sentence structure, conversational flow.
-- For behavioural/situational questions ("Tell me about a time...", "Describe a situation...", "Give me an example..."): tell a real story using the candidate's CV. Don't label STAR sections — just tell it as a natural story. Use multiple examples from the CV where relevant. 8–10 sentences.
-- For technical or knowledge questions: answer directly and confidently like explaining to a peer. No storytelling needed. 4–6 sentences.
-- For opinion/motivation questions: give a genuine, well-reasoned answer. 4–6 sentences.
-- No bullet-point prose. No filler phrases ("That's a great question", "In conclusion").
+- Sound like a confident, well-prepared candidate speaking naturally in an interview — not reading from a script.
+- Use contractions, varied sentence length, natural transitions. Avoid robotic or essay-style writing.
+
+- BEHAVIOURAL questions ("Tell me about a time...", "Give me an example...", "Describe a situation..."):
+  Tell a real story from the CV. No STAR labels — just narrate naturally: what was happening, what you did, what happened as a result. 8–10 sentences. Use multiple CV examples if relevant.
+
+- TECHNICAL / KNOWLEDGE questions ("What is X?", "Explain Y", "How does Z work?", "Tell me about a technique you know", "What is a transformer?", "Explain machine learning..."):
+  Give a clear, confident technical explanation as if talking to a knowledgeable interviewer. Define the concept, explain how it works, mention key components or use cases. DO NOT give personal examples or reference the CV — this is a knowledge question, not an experience question. 5–7 sentences.
+
+- OPINION / MOTIVATION questions ("Why do you want this role?", "How do you approach X?", "What's your style?"):
+  Genuine, specific, well-reasoned. Draw on the JD and CV naturally. 4–6 sentences.
+
+- No bullet-point prose ("Firstly... Secondly..."). No filler ("That's a great question", "In conclusion", "Absolutely").
 - Write in first person.
 
 Return ONLY valid JSON:

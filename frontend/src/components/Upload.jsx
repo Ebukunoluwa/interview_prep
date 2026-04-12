@@ -87,46 +87,64 @@ export default function Upload({ onComplete, onSessionReady }) {
   function startRecording(index) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SR) {
-      setError('Speech recognition not supported — use Chrome or Edge.')
+      setError('Speech recognition not supported — use Chrome or Safari.')
       return
     }
 
-    const recognition = new SR()
-    recognition.continuous = true
-    recognition.interimResults = true
-    recognition.lang = 'en-US'
-
     let finalText = ''
+    let stopped = false  // true when user manually stops
 
-    recognition.onresult = (e) => {
-      let interim = ''
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        if (e.results[i].isFinal) finalText += e.results[i][0].transcript + ' '
-        else interim += e.results[i][0].transcript
+    function createRec() {
+      const rec = new SR()
+      rec.continuous = true
+      rec.interimResults = true
+      rec.lang = 'en-US'
+      rec.maxAlternatives = 1
+
+      rec.onresult = (e) => {
+        let interim = ''
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) finalText += e.results[i][0].transcript + ' '
+          else interim += e.results[i][0].transcript
+        }
+        setAnswers(prev => ({ ...prev, [index]: (finalText + interim).trim() }))
       }
-      setAnswers(prev => ({ ...prev, [index]: (finalText + interim).trim() }))
-    }
 
-    recognition.onend = () => {
-      setActiveQ(null)
-      const text = finalText.trim()
-      if (text) {
-        setAnswers(prev => {
-          const next = { ...prev, [index]: text }
-          saveToStorage(questions, sessionId, next, grades)
-          return next
-        })
-        gradeAnswer(index, text)
+      rec.onend = () => {
+        // Auto-restart unless the user manually stopped
+        if (!stopped) {
+          try { createRec().start() } catch (_) {}
+          return
+        }
+        setActiveQ(null)
+        const text = finalText.trim()
+        if (text) {
+          setAnswers(prev => {
+            const next = { ...prev, [index]: text }
+            saveToStorage(questions, sessionId, next, grades)
+            return next
+          })
+          gradeAnswer(index, text)
+        }
       }
+
+      rec.onerror = (e) => {
+        if (e.error === 'no-speech' || e.error === 'aborted') return
+        setError(`Mic error: ${e.error}`)
+        stopped = true
+        setActiveQ(null)
+      }
+
+      recognitionRef.current = rec
+      return rec
     }
 
-    recognition.onerror = (e) => {
-      setActiveQ(null)
-      if (e.error !== 'no-speech') setError(`Mic error: ${e.error}`)
-    }
+    // Override stop so we can flag it as intentional
+    const rec = createRec()
+    const originalStop = recognitionRef.current.stop.bind(recognitionRef.current)
+    recognitionRef.current.stop = () => { stopped = true; originalStop() }
 
-    recognition.start()
-    recognitionRef.current = recognition
+    rec.start()
     setActiveQ(index)
   }
 
