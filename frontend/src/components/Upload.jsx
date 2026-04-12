@@ -182,8 +182,28 @@ export default function Upload({ onComplete, onSessionReady }) {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!jdFiles.length) return
     setError('')
+
+    // No new files but session exists — just regenerate questions
+    if (!jdFiles.length && sessionId) {
+      setStatus('generating')
+      try {
+        const res = await fetch(`${API}/generate-questions/${sessionId}`, { method: 'POST' })
+        if (!res.ok) throw new Error(`Failed (${res.status})`)
+        const { questions: qs } = await res.json()
+        setQuestions(qs)
+        setAnswers({})
+        setGrades({})
+        saveToStorage(qs, sessionId, {}, {})
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setStatus('idle')
+      }
+      return
+    }
+
+    if (!jdFiles.length) return
     setStatus('uploading')
 
     try {
@@ -552,7 +572,7 @@ export default function Upload({ onComplete, onSessionReady }) {
           <div className="bg-red-900/40 border border-red-700 rounded-xl px-4 py-3 text-sm text-red-300">{error}</div>
         )}
 
-        <button type="submit" disabled={!jdFiles.length || busy} className="btn-primary w-full text-base">
+        <button type="submit" disabled={(!jdFiles.length && !sessionId) || busy} className="btn-primary w-full text-base">
           {busy ? (
             <span className="flex items-center justify-center gap-2">
               <Spinner />
