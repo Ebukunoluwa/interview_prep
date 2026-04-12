@@ -513,28 +513,13 @@ async def realtime_assist(session_id: str, payload: RealtimePayload):
         f"=== {d['name']} ===\n{d['text'][:_ctx_chars]}" for d in documents
     )
 
-    # Build RAG bank from ALL documents + dedicated Q&A file
-    all_qa_pairs = list(session.get("qa_pairs", []))  # from dedicated Q&A slot
-    for doc in documents:
-        doc_pairs = parse_qa_pairs(doc["text"])
-        for p in doc_pairs:
-            if p.get("answer", "").strip():
-                all_qa_pairs.append(p)
-
-    # Deduplicate by question text
-    seen = set()
-    unique_pairs = []
-    for p in all_qa_pairs:
-        key = p["question"].strip().lower()[:80]
-        if key not in seen and p.get("answer", "").strip():
-            seen.add(key)
-            unique_pairs.append(p)
-
+    # RAG: only from the dedicated Q&A file slot
+    qa_pairs = [p for p in session.get("qa_pairs", []) if p.get("answer", "").strip()]
     qa_bank = ""
-    if unique_pairs:
-        qa_bank = "\n\nPREPARED ANSWER BANK (from candidate's uploaded documents):\n"
+    if qa_pairs:
+        qa_bank = "\n\nPREPARED ANSWER BANK (from candidate's uploaded Q&A file):\n"
         qa_bank += "\n\n".join(
-            f"Q: {p['question']}\nA: {p['answer']}" for p in unique_pairs[:40]
+            f"Q: {p['question']}\nA: {p['answer']}" for p in qa_pairs[:40]
         )
 
     prompt = f"""You are an interview coach helping a candidate in a live interview.
