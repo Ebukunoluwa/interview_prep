@@ -258,23 +258,62 @@ export default function AssistantListener({ sessionId }) {
 
             {/* Answer */}
             {answer && !loading && (
-              <div className="w-full max-w-3xl space-y-5">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-brand-400 uppercase tracking-widest">
+              <div className="w-full max-w-2xl space-y-3">
+                {/* Label + actions */}
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-xs font-semibold text-brand-400 uppercase tracking-widest">
                     {answerType === 'question' ? 'Suggested answer' : 'Completing your answer'}
                   </span>
                   <div className="flex items-center gap-4">
                     <button
                       onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(answer) }}
-                      className="text-sm text-brand-400 hover:text-brand-300 font-medium"
+                      className="text-xs text-brand-400 hover:text-brand-300 font-medium"
                     >Copy</button>
                     <button
                       onClick={(e) => { e.stopPropagation(); setAnswer(''); setTranscript(''); setAnswerType('') }}
-                      className="text-sm text-gray-500 hover:text-white"
+                      className="text-xs text-gray-500 hover:text-white"
                     >Clear</button>
                   </div>
                 </div>
-                <p className="text-lg text-white leading-relaxed">{answer}</p>
+
+                {/* Paper card */}
+                <div
+                  className="bg-white rounded-2xl shadow-2xl px-8 py-7 overflow-y-auto"
+                  style={{ maxHeight: '60vh' }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <div className="space-y-4 text-gray-900 text-[15px] leading-7 font-normal">
+                    {answer.split(/\n\n+/).map((para, i) => {
+                      const trimmed = para.trim()
+                      if (!trimmed) return null
+
+                      // Bold label like "Situation:" or "**Situation**"
+                      const labelMatch = trimmed.match(/^\*?\*?([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\*?\*?[:\—–](.*)$/s)
+                      if (labelMatch) {
+                        return (
+                          <p key={i}>
+                            <span className="font-semibold text-gray-800">{labelMatch[1]}: </span>
+                            {labelMatch[2].trim()}
+                          </p>
+                        )
+                      }
+
+                      // Bullet lines
+                      if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+                        const items = trimmed.split('\n').filter(Boolean)
+                        return (
+                          <ul key={i} className="list-disc list-inside space-y-1 pl-1">
+                            {items.map((item, j) => (
+                              <li key={j}>{item.replace(/^[-•]\s*/, '')}</li>
+                            ))}
+                          </ul>
+                        )
+                      }
+
+                      return <p key={i}>{trimmed}</p>
+                    })}
+                  </div>
+                </div>
               </div>
             )}
           </div>
