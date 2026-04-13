@@ -683,10 +683,9 @@ export default function Upload({ onComplete, onSessionReady }) {
               return (
                 <li key={i} className="rounded-xl overflow-hidden border border-gray-700">
                   {/* Question row */}
-                  <button
-                    type="button"
+                  <div
                     onClick={() => toggleQuestion(i)}
-                    className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors ${
+                    className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors cursor-pointer ${
                       isRecording
                         ? 'bg-red-900/30 border-red-700'
                         : isDone
@@ -726,7 +725,7 @@ export default function Upload({ onComplete, onSessionReady }) {
                       }`}>{grade.score}/10</span>
                     )}
                     {isGrading && <Spinner />}
-                  </button>
+                  </div>
 
                   {/* Live transcript / answer */}
                   {(isRecording || isDone) && answers[i] && (
