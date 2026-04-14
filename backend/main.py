@@ -527,9 +527,14 @@ async def realtime_assist(session_id: str, payload: RealtimePayload):
 The candidate just heard or started saying:
 "{text}"
 
-CANDIDATE CONTEXT (CV, job description, skills, etc.):
+CANDIDATE CONTEXT:
 {doc_context}
 {qa_bank}
+
+IMPORTANT — HOW TO USE THE DOCUMENTS:
+- The CV is your PRIMARY source for all answers. Use the candidate's real experience, roles, projects, skills, and achievements from the CV to answer every question.
+- The job description is CONTEXT ONLY — use it to understand what the role requires, but do NOT answer questions using the JD content. The candidate should be talking about themselves, not the job.
+- If multiple documents are uploaded, identify which is the CV (usually has name, experience, education sections) and draw answers from that.
 
 TASK:
 1. Classify what was said as one of:
